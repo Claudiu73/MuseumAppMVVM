@@ -8,5 +8,5 @@ public interface IArtWork {
     ArtWork getArtworkByName(String name) throws DAOException;
     List<ArtWork> getAllArtworks() throws DAOException;
     void updateArtwork(ArtWork artwork) throws DAOException;
-    void deleteArtwork(String artist) throws DAOException;
+    void deleteArtwork(String title) throws DAOException;
 }

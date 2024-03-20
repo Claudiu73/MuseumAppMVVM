@@ -113,13 +113,13 @@ public class ArtWorkRepository implements IArtWork{
 
 
     @Override
-    public void deleteArtwork(String artist) throws DAOException {
-        String sql = "DELETE FROM artworks WHERE artist=?";
+    public void deleteArtwork(String title) throws DAOException {
+        String sql = "DELETE FROM artworks WHERE title=?";
 
         try (Connection conn = ConnectionBD.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
 
-            statement.setString(1, artist);
+            statement.setString(1, title);
 
             int affectedRows = statement.executeUpdate();
             if (affectedRows == 0) {

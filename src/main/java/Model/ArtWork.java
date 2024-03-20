@@ -59,5 +59,11 @@ public class ArtWork {
     public int getId() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return artist + " - " + title + " (" + year + ", " + type + ")";
+    }
+
 }
 
