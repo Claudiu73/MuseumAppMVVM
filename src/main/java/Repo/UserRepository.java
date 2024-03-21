@@ -25,11 +25,11 @@ public class UserRepository implements IUser{
     }
 
     @Override
-    public void deleteUser(int userId) throws DAOException {
-        String sql = "DELETE FROM users WHERE id = ?";
+    public void deleteUser(String username) throws DAOException {
+        String sql = "DELETE FROM users WHERE username = ?";
         try (Connection conn = ConnectionBD.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setInt(1, userId);
+            statement.setString(1, username);
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new DAOException("Error deleting user", e);

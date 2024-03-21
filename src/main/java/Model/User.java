@@ -46,5 +46,10 @@ public class User {
     public void setId(int i) {
         this.id = i;
     }
+
+    public String toString()
+    {
+        return username + " (" + password + ") " + userType;
+    }
 }
 
