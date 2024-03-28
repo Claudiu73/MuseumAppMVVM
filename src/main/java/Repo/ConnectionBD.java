@@ -13,8 +13,8 @@ public class ConnectionBD {
     private static final Logger LOGGER = Logger.getLogger(ConnectionBD.class.getName());
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
     private static final String DBURL = "jdbc:mysql://localhost:3306/museum_db";
-    private static final String USER = "root"; // Pune aici numele de utilizator al bazei tale de date
-    private static final String PASS = "Branzapute73!"; // Pune aici parola bazei tale de date
+    private static final String USER = "root";
+    private static final String PASS = "Branzapute73!";
 
     private static ConnectionBD singleInstance = new ConnectionBD();
 

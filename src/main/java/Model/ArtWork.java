@@ -1,14 +1,12 @@
 package Model;
 
 public class ArtWork {
-
     private int id;
     private String title;
     private String artist;
     private int year;
-    private String type; // Ex: painting, sculpture
+    private String type;
 
-    // Constructor without description
     public ArtWork(String title, String artist, int year, String type) {
         this.title = title;
         this.artist = artist;

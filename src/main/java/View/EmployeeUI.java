@@ -1,25 +1,25 @@
 package View;
 
-import Model.ArtWork;
-import Repo.ArtWorkRepository;
-import Repo.DAOException;
+import Presenter.EmployeePresenter;
+import Presenter.IEmployeeUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
-import java.util.Vector;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class EmployeeUI extends JFrame {
+public class EmployeeUI extends JFrame implements IEmployeeUI {
+    private EmployeePresenter employeePresenter;
     private JList<String> list1;
     private DefaultListModel<String> listModel;
     private JTextField textField1, textField2, textField3, textField4;
     private JButton adaugaButton, stergeButton, actualizeazaButton, cautaButton;
-    private ArtWorkRepository artWorkRepository;
+
 
     public EmployeeUI() {
-        artWorkRepository = new ArtWorkRepository();
+        employeePresenter = new EmployeePresenter(this);
         initializeUI();
-        fetchAndDisplayArtworks();
+        employeePresenter.fetchAndDisplayArtworks();
     }
 
     private void initializeUI() {
@@ -102,120 +102,123 @@ public class EmployeeUI extends JFrame {
         gbc.gridy = 4;
         gbc.gridwidth = 1;
         add(adaugaButton, gbc);
-        adaugaButton.addActionListener(e -> onAddButtonClicked());
+        adaugaButton.addActionListener(onAddButtonClicked());
 
         stergeButton = new JButton("Sterge");
         gbc.gridx = 2;
         gbc.gridy = 4;
         add(stergeButton, gbc);
-        stergeButton.addActionListener(e -> onDeleteButtonClicked());
+        stergeButton.addActionListener(onDeleteButtonClicked());
 
         actualizeazaButton = new JButton("Actualizeaza");
         gbc.gridx = 3;
         gbc.gridy = 4;
         add(actualizeazaButton, gbc);
-        actualizeazaButton.addActionListener(e -> fetchAndDisplayArtworks());
+        actualizeazaButton.addActionListener(fetchAndDisplayArtworks());
 
         cautaButton = new JButton("Cauta");
         gbc.gridx = 4;
         gbc.gridy = 4;
         add(cautaButton, gbc);
-        cautaButton.addActionListener(e -> onSearchButtonClicked());
+        cautaButton.addActionListener(onSearchButtonClicked());
 
         pack();
-        setLocationRelativeTo(null); // Center on screen
+        setLocationRelativeTo(null);
     }
 
-    private void fetchAndDisplayArtworks() {
-        try {
-            List<ArtWork> artworks = artWorkRepository.getAllArtworks();
-            listModel.clear();
-            for (ArtWork artwork : artworks) {
-                listModel.addElement(artwork.toString()); // Make sure toString() is overridden in ArtWork
+
+    public ActionListener onAddButtonClicked()
+    {
+        ActionListener e = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                employeePresenter.onAddButtonClicked();
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error loading artworks: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
+        };
+        return e;
     }
 
-    private void onAddButtonClicked() {
-        // Extrage valorile din câmpurile de text
-        String titlu = textField1.getText().trim();
-        String artist = textField2.getText().trim();
-        int an;
-        try {
-            an = Integer.parseInt(textField3.getText().trim());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Anul trebuie să fie un număr întreg.", "Eroare", JOptionPane.ERROR_MESSAGE);
-            return; // Ieșire din metodă dacă anul nu este un număr valid
-        }
-        String tip = textField4.getText().trim();
-
-        // Validează valorile extrase (optional)
-        if (titlu.isEmpty() || artist.isEmpty() || tip.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Toate câmpurile trebuie completate.", "Eroare", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Creează o nouă operă de artă și adaugă-o în baza de date
-        ArtWork newArtWork = new ArtWork(titlu, artist, an, tip);
-        try {
-            artWorkRepository.addArtwork(newArtWork);
-            JOptionPane.showMessageDialog(this, "Opera de artă a fost adăugată cu succes.", "Succes", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Eroare la adăugarea operei de artă: " + e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
-    }
-
-    private void onDeleteButtonClicked() {
-        // Extrage titlul operei de artă de șters din textField1
-        String titleToDelete = textField1.getText().trim();
-        if (titleToDelete.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vă rugăm introduceți titlul operei de artă pentru ștergere.", "Informație lipsă", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        // Confirmă ștergerea cu utilizatorul
-        int response = JOptionPane.showConfirmDialog(this, "Sunteți sigur că doriți să ștergeți opera de artă cu titlul: " + titleToDelete + "?", "Confirmare ștergere", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (response == JOptionPane.YES_OPTION) {
-            try {
-                // Șterge opera de artă din baza de date
-                artWorkRepository.deleteArtwork(titleToDelete);
-                JOptionPane.showMessageDialog(this, "Opera de artă a fost ștearsă cu succes.", "Succes", JOptionPane.INFORMATION_MESSAGE);
-
-            } catch (DAOException daoException) {
-                JOptionPane.showMessageDialog(this, "Eroare la ștergerea operei de artă: " + daoException.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
-                daoException.printStackTrace();
+    public ActionListener onDeleteButtonClicked()
+    {
+        ActionListener e = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                employeePresenter.onDeleteButtonClicked();
             }
-        }
+        };
+        return e;
     }
 
-    private void onSearchButtonClicked() {
-        // Extrage titlul introdus de utilizator
-        String searchTitle = textField1.getText().trim();
-        if (searchTitle.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vă rugăm introduceți titlul operei de artă pentru căutare.", "Informație lipsă", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        try {
-            // Caută opera de artă după titlu
-            ArtWork searchedArtwork = artWorkRepository.getArtworkByName(searchTitle);
-
-            // Dacă nu se găsește opera de artă
-            if (searchedArtwork == null) {
-                JOptionPane.showMessageDialog(this, "Nu s-a găsit nicio operă de artă cu titlul: " + searchTitle, "Rezultat căutare", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                // Afișează detaliile operei de artă găsite
-                JOptionPane.showMessageDialog(this, "Detalii opera de artă găsită:\nTitlu: " + searchedArtwork.getTitle() + "\nArtist: " + searchedArtwork.getArtist() + "\nAn: " + searchedArtwork.getYear() + "\nTip: " + searchedArtwork.getType(), "Rezultat căutare", JOptionPane.INFORMATION_MESSAGE);
+    public ActionListener fetchAndDisplayArtworks()
+    {
+        ActionListener e = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                employeePresenter.fetchAndDisplayArtworks();
             }
-        } catch (DAOException daoException) {
-            JOptionPane.showMessageDialog(this, "Eroare la căutarea operei de artă: " + daoException.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
-            daoException.printStackTrace();
-        }
+        };
+        return e;
     }
 
-    // Add methods for button click actions here
+
+    public ActionListener onSearchButtonClicked()
+    {
+        ActionListener e = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                employeePresenter.onSearchButtonClicked();
+            }
+        };
+        return e;
+    }
+
+
+    public JList<String> getList1() {
+        return list1;
+    }
+
+    public void setList1(JList<String> list1) {
+        this.list1 = list1;
+    }
+
+    public DefaultListModel<String> getListModel() {
+        return listModel;
+    }
+
+    public void setListModel(DefaultListModel<String> listModel) {
+        this.listModel = listModel;
+    }
+
+    public String getTextField1() {
+        return textField1.getText();
+    }
+
+    public void setTextField1(String textField1) {
+        this.textField1.setText( textField1);
+    }
+
+    public String getTextField2() {
+        return textField2.getText();
+    }
+
+    public void setTextField2(String textField2) {
+        this.textField2.setText(textField2);
+    }
+
+    public String getTextField3() {
+        return textField3.getText();
+    }
+
+    public void setTextField3(String textField3) {
+        this.textField3.setText(textField3);
+    }
+
+    public String getTextField4() {
+        return textField4.getText();
+    }
+
+    public void setTextField4(String textField4) {
+        this.textField4.setText(textField4);
+    }
+
 }

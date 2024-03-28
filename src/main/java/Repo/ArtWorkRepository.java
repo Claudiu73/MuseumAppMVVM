@@ -1,7 +1,6 @@
 package Repo;
 
 import Model.ArtWork;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -21,7 +20,7 @@ public class ArtWorkRepository implements IArtWork{
             statement.setInt(3, artwork.getYear());
             statement.setString(4, artwork.getType());
             statement.executeUpdate();
-        }
+            System.out.println("Opera de arta adaugata cu succes.");        }
         catch (SQLException e) {
             throw new DAOException("Error adding artwork", e);
         }
@@ -45,9 +44,8 @@ public class ArtWorkRepository implements IArtWork{
                 String artist = resultSet.getString("artist");
                 int year = resultSet.getInt("year");
                 String type = resultSet.getString("type");
-                // Presupunând că constructorul și getterii/setterii sunt corect implementați în clasa ArtWork
                 artwork = new ArtWork(title, artist, year, type);
-                artwork.setId(id); // Asigură-te că ArtWork are un setter pentru id
+                artwork.setId(id);
             }
         } catch (SQLException e) {
             throw new DAOException("Error fetching artwork by name", e);
@@ -71,9 +69,8 @@ public class ArtWorkRepository implements IArtWork{
                 String artist = resultSet.getString("artist");
                 int year = resultSet.getInt("year");
                 String type = resultSet.getString("type");
-                // Presupunând că ai un constructor adecvat în clasa ArtWork
                 ArtWork artwork = new ArtWork(title, artist, year, type);
-                artwork.setId(id); // Asigură-te că ai un setter pentru id în clasa ArtWork
+                artwork.setId(id);
                 artworks.add(artwork);
             }
         } catch (SQLException e) {
@@ -85,20 +82,19 @@ public class ArtWorkRepository implements IArtWork{
 
     @Override
     public void updateArtwork(ArtWork artwork) throws DAOException {
-        // Presupunem că tabela artworks are coloane pentru id, title, artist, year, și type
+
         String sql = "UPDATE artworks SET title = ?, artist = ?, year = ?, type = ? WHERE id = ?";
 
         try (Connection conn = ConnectionBD.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
 
-            // Setează valorile pentru fiecare parametru din interogarea SQL
             statement.setString(1, artwork.getTitle());
             statement.setString(2, artwork.getArtist());
             statement.setInt(3, artwork.getYear());
             statement.setString(4, artwork.getType());
-            statement.setInt(5, artwork.getId()); // Asigură-te că ai un getter pentru ID în clasa ArtWork
+            statement.setInt(5, artwork.getId());
 
-            // Execută interogarea de actualizare
+
             int rowsUpdated = statement.executeUpdate();
 
             if (rowsUpdated > 0) {
@@ -122,6 +118,7 @@ public class ArtWorkRepository implements IArtWork{
             statement.setString(1, title);
 
             int affectedRows = statement.executeUpdate();
+            System.out.println("Stergerea a reusit.");
             if (affectedRows == 0) {
                 throw new DAOException("Ștergerea operelor de artă a eșuat; niciun rând afectat.");
             }

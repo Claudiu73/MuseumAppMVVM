@@ -1,29 +1,28 @@
 package View;
 
-import Model.ArtWork;
-import Model.User;
-import Repo.ArtWorkRepository;
-import Repo.DAOException;
-import Repo.UserRepository;
-import java.util.List;
+import Presenter.AdminPresenter;
+import Presenter.IAdminUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.stream.Collectors;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class AdminUI extends JFrame {
+public class AdminUI extends JFrame implements IAdminUI {
     private JList<String> list1;
     private JList<String> list2;
     private JTextField textField1, textField2, textField3, textField4;
     private JButton adaugaButton, stergeButton, cautaButton, actualizeazaButton, cautaOperaButton;
-
-    private DefaultListModel<String> listModel;
+    private DefaultListModel<String> listModel, listModel1;
+    private AdminPresenter adminPresenter;
 
     public AdminUI() {
+        adminPresenter = new AdminPresenter(this);
         listModel = new DefaultListModel<>();
+        listModel1 = new DefaultListModel<>();
         initializeUI();
-        fetchAndDisplayArtworks();
-        fetchAndDisplayUsers();
+        adminPresenter.fetchAndDisplayArtworks();
+        adminPresenter.fetchAndDisplayUsers();
     }
 
     private void initializeUI() {
@@ -36,17 +35,20 @@ public class AdminUI extends JFrame {
         listModel = new DefaultListModel<>();
         list1.setModel(listModel);
 
+        listModel1 = new DefaultListModel<>();
+        list2.setModel(listModel1);
+
         initializeLists(gbc);
         initializeTextFieldsAndLabels(gbc);
         initializeButtonsCentered(gbc);
 
 
         pack();
-        setLocationRelativeTo(null); // Centrează fereastra pe ecran
+        setLocationRelativeTo(null);
     }
 
     private void initializeLists(GridBagConstraints gbc) {
-        list1 = new JList<>(listModel); // Utilizează modelul inițializat
+        list1 = new JList<>(listModel);
         JScrollPane scrollPaneArtworks = new JScrollPane(list1);
 
         list2 = new JList<>();
@@ -60,7 +62,7 @@ public class AdminUI extends JFrame {
         gbc.weightx = 0.25;
         add(scrollPaneUsers, gbc);
 
-        gbc.gridheight = 1; gbc.weightx = 0; // Reset
+        gbc.gridheight = 1; gbc.weightx = 0;
     }
 
     private void initializeTextFieldsAndLabels(GridBagConstraints gbc) {
@@ -80,7 +82,6 @@ public class AdminUI extends JFrame {
     }
 
     private void initializeButtonsCentered(GridBagConstraints gbc) {
-        // Create a panel for buttons to align them in center
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
@@ -90,166 +91,157 @@ public class AdminUI extends JFrame {
         actualizeazaButton = new JButton("Actualizează");
         cautaOperaButton = new JButton("Caută Opera");
 
-        adaugaButton.addActionListener(e -> onAddUserClicked());
-        actualizeazaButton.addActionListener(e -> fetchAndDisplayUsers());
-        stergeButton.addActionListener(e -> addDeleteUserListener());
-        cautaButton.addActionListener(e -> addSearchUserListener());
-        cautaOperaButton.addActionListener(e -> filterArtworks());
 
-
-
-        // Add buttons to the panel
         buttonPanel.add(adaugaButton);
+        adaugaButton.addActionListener(onAddUserClicked());
         buttonPanel.add(stergeButton);
+        stergeButton.addActionListener(addDeleteUserListener());
         buttonPanel.add(cautaButton);
+        cautaButton.addActionListener(addSearchUserListener());
         buttonPanel.add(actualizeazaButton);
+        actualizeazaButton.addActionListener(fetchAndDisplayUsers());
         buttonPanel.add(cautaOperaButton);
+        cautaOperaButton.addActionListener(filterArtworks());
 
-        // Add the button panel to the grid, spanning across columns
         gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(buttonPanel, gbc);
     }
 
-    private void onAddUserClicked() {
-        String username = textField1.getText().trim();
-        String password = textField2.getText().trim();
-        String usertype = textField3.getText().trim();
 
-        UserRepository userRepository = new UserRepository();
-
-        // Validare date introduse
-        if (username.isEmpty() || password.isEmpty() || usertype.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Toate câmpurile trebuie completate!", "Eroare", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Creează un nou utilizator
-        User newUser = new User(username, password, usertype);
-
-        try {
-            // Adaugă utilizatorul în baza de date folosind UserRepository
-
-            userRepository.addUser(newUser); // Presupunem că ai o instanță a lui UserRepository accesibilă aici
-            JOptionPane.showMessageDialog(this, "Utilizator adăugat cu succes.", "Succes", JOptionPane.INFORMATION_MESSAGE);
-
-            // Opțional: Actualizează lista de utilizatori afișată
-            // fetchAndDisplayUsers();
-        } catch (DAOException ex) {
-            JOptionPane.showMessageDialog(this, "Eroare la adăugarea utilizatorului: " + ex.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void fetchAndDisplayUsers() {
-        UserRepository userRepository = new UserRepository();
-        try {
-            // Presupunem că UserRepository are o metodă getAllUsers() care returnează o listă de utilizatori
-            List<User> users = userRepository.getAllUsers();
-            DefaultListModel<String> userModel = new DefaultListModel<>();
-
-            for (User user : users) {
-                // Presupunem că User are o metodă toString() care returnează un String reprezentativ
-                userModel.addElement(user.toString());
+    public ActionListener onAddUserClicked()
+    {
+        ActionListener e = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                adminPresenter.onAddUserClicked();
             }
-
-            list2.setModel(userModel);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Eroare la încărcarea utilizatorilor: " + e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
+        };
+        return e;
     }
 
-    private void fetchAndDisplayArtworks() {
-
-        ArtWorkRepository artWorkRepository = new
-                ArtWorkRepository();
-
-        try {
-
-            List<ArtWork> artworks = artWorkRepository.getAllArtworks();
-            updateList(artworks);
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Eroare la încărcarea operelor de artă: " + e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void addDeleteUserListener() {
-        String username = textField1.getText().trim(); // Presupunând că textField1 este folosit pentru introducerea numelui de utilizator
-
-        if(username.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vă rugăm introduceți username-ul pentru ștergere.", "Informație lipsă", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        UserRepository userRepository = new UserRepository();
-        try {
-            User user = userRepository.getUserByUsername(username);
-            if (user == null) {
-                JOptionPane.showMessageDialog(this, "Utilizatorul nu există.", "Eroare", JOptionPane.ERROR_MESSAGE);
-                return;
+    public ActionListener addDeleteUserListener()
+    {
+        ActionListener e = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                adminPresenter.addDeleteUserListener();
             }
+        };
+        return e;
+    }
 
-            int response = JOptionPane.showConfirmDialog(this, "Sunteți sigur că doriți să ștergeți utilizatorul " + username + "?", "Confirmare ștergere", JOptionPane.YES_NO_OPTION);
-            if (response == JOptionPane.YES_OPTION) {
-                userRepository.deleteUser(username);
-                JOptionPane.showMessageDialog(this, "Utilizatorul a fost șters cu succes.", "Succes", JOptionPane.INFORMATION_MESSAGE);
+    public ActionListener addSearchUserListener()
+    {
+        ActionListener e = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                adminPresenter.addSearchUserListener();
             }
-        } catch (DAOException ex) {
-            JOptionPane.showMessageDialog(this, "Eroare la ștergerea utilizatorului: " + ex.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
-        }
+        };
+        return e;
     }
 
-    private void addSearchUserListener() {
-
-            String username = textField1.getText().trim(); // Preia username-ul din textField1
-            if (username.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vă rugăm introduceți un username pentru căutare.", "Informație lipsă", JOptionPane.INFORMATION_MESSAGE);
-                return;
+    public ActionListener filterArtworks()
+    {
+        ActionListener e = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                adminPresenter.filterArtworks();
             }
+        };
+        return e;
+    }
 
-            try {
-                UserRepository userRepository = new UserRepository();
-                User user = userRepository.getUserByUsername(username);
-
-                if (user != null) {
-                    // Afișează detaliile utilizatorului găsit
-                    JOptionPane.showMessageDialog(this, "Utilizator găsit: \nUsername: " + user.getUsername() + "\nParolă: " + user.getPassword() + "\nTip: " + user.getUserType(), "Rezultat Căutare", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    // Utilizatorul nu a fost găsit
-                    JOptionPane.showMessageDialog(this, "Nu a fost găsit niciun utilizator cu username-ul " + username + ".", "Utilizator inexistent", JOptionPane.ERROR_MESSAGE);
-                }
-
-            } catch (DAOException ex) {
-                JOptionPane.showMessageDialog(this, "Eroare la căutarea utilizatorului: " + ex.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
+    public ActionListener fetchAndDisplayUsers()
+    {
+        ActionListener e = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                adminPresenter.fetchAndDisplayUsers();
             }
-
+        };
+        return e;
     }
 
-    private void filterArtworks() {
-        ArtWorkRepository artWorkRepository = new ArtWorkRepository();
-        String searchText = textField4.getText().trim();
-        try {
-
-            List<ArtWork> artworks = artWorkRepository.getAllArtworks();
-            List<ArtWork> filteredArtworks = artworks.stream()
-                    .filter(artwork -> artwork.getArtist().toLowerCase().contains(searchText.toLowerCase())
-                            || artwork.getTitle().toLowerCase().contains(searchText.toLowerCase()))
-                    .collect(Collectors.toList());
-            updateList(filteredArtworks);
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Eroare la filtrarea operelor de artă: " + e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
-        }
+    @Override
+    public JList<String> getUserList() {
+        return list1;
     }
 
-    private void updateList(List<ArtWork> artworks) {
-        listModel.clear();
-        for (ArtWork artwork : artworks) {
-            listModel.addElement(artwork.toString()); // Presupunând că ArtWork are o metodă toString() adecvată
-        }
+    @Override
+    public JList<String> getArtWorkList() {
+        return list2;
     }
 
+    @Override
+    public void setArtWorkList(JList<String> artWorkList) {
+        this.list2 = list2;
+    }
 
+    @Override
+    public DefaultListModel<String> getArtWorksList() {
+        return listModel1;
+    }
+
+    @Override
+    public void setUserList(JList<String> userList) {
+        this.list1 = list1;
+    }
+
+    @Override
+    public void setArtWorksList(DefaultListModel<String> artWorksList) {
+        this.list2.setModel(artWorksList);
+    }
+
+    @Override
+    public DefaultListModel<String> getUserListModel() {
+        return listModel;
+    }
+
+    @Override
+    public void setUserListModel(DefaultListModel<String> userListModel) {
+        this.listModel = listModel;
+    }
+
+    @Override
+    public String getUsernameField() {
+        return textField1.getText();
+    }
+
+    @Override
+    public void setUsernameField(String username) {
+        this.textField1.setText(username);
+    }
+
+    @Override
+    public String getPasswordField() {
+        return textField2.getText();
+    }
+
+    @Override
+    public void setPasswordField(String password) {
+        this.textField2.setText(password);
+    }
+
+    @Override
+    public String getUserTypeField() {
+        return textField3.getText();
+    }
+
+    @Override
+    public void setUserTypeField(String userType) {
+        this.textField3.setText(userType);
+    }
+
+    @Override
+    public String getArtWorkFilter() {
+        return textField4.getText();
+    }
+
+    @Override
+    public void setArtWorkFilter(String filter) {
+        this.textField4.setText(filter);
+    }
 
 }

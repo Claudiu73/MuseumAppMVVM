@@ -52,4 +52,3 @@ public class User {
         return username + " (" + password + ") " + userType;
     }
 }
-

@@ -1,14 +1,13 @@
 package View;
 
-import Model.ArtWork;
-import Repo.ArtWorkRepository;
-
+import Presenter.ArtWorkListPresenter;
+import Presenter.IArtWorkUI;
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class ArtWorkListView extends JFrame {
+public class ArtWorkListView extends JFrame implements IArtWorkUI {
     private JList<String> list1;
     private DefaultListModel<String> listModel;
     private JTextField textField1;
@@ -16,7 +15,17 @@ public class ArtWorkListView extends JFrame {
 
     private JScrollPane ScrollPane;
 
+    private ArtWorkListPresenter artWorkListPresenter;
+
     public ArtWorkListView() {
+
+        artWorkListPresenter = new ArtWorkListPresenter(this);
+        listModel = new DefaultListModel<>();
+        initializeUI();
+        artWorkListPresenter.fetchAndDisplayArtworks();
+    }
+
+    private void initializeUI() {
         setTitle("Lista Opere de Arta");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -28,62 +37,70 @@ public class ArtWorkListView extends JFrame {
         ScrollPane = new JScrollPane(list1);
 
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1;
-        gbc.weighty = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = GridBagConstraints.REMAINDER; // Componenta se întinde pe toată lățimea rândului
-        gbc.insets = new Insets(10, 10, 10, 10); // Adaugă un spațiu pentru estetică
+        gbc.gridwidth = 2;
         add(ScrollPane, gbc);
 
-        gbc.gridwidth = 1; // Resetare la comportamentul implicit
-        gbc.gridy++; // Mergem la următorul rând pentru componentele de căutare
-        gbc.weighty = 0; // Nu alocăm spațiu suplimentar pe verticală pentru aceste componente
-        gbc.weightx = 0.8; // Câmpul de text folosește majoritatea spațiului orizontal
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
         textField1 = new JTextField();
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.8;
+        gbc.weighty = 0;
         add(textField1, gbc);
 
-        gbc.weightx = 0.2; // Butonul folosește mai puțin spațiu orizontal
-        gbc.gridx++; // Mutăm butonul pe coloana următoare
         cautaButton = new JButton("Caută");
+        gbc.gridx = 1;
+        gbc.weightx = 0.2;
         add(cautaButton, gbc);
 
-        cautaButton.addActionListener(e -> filterArtworks(textField1.getText()));
-        fetchAndDisplayArtworks();
+        cautaButton.addActionListener(filterArtworks());
     }
 
-    private void fetchAndDisplayArtworks() {
-        try {
-            ArtWorkRepository repository = new ArtWorkRepository();
-            List<ArtWork> artworks = repository.getAllArtworks();
-            updateList(artworks);
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Eroare la încărcarea operelor de artă: " + e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
-        }
+    public ActionListener filterArtworks()
+    {
+        ActionListener e = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                artWorkListPresenter.filterArtworks();
+            }
+        };
+        return e;
     }
 
-    private void filterArtworks(String searchText) {
-        try {
-            ArtWorkRepository repository = new ArtWorkRepository();
-            List<ArtWork> artworks = repository.getAllArtworks();
-            // Filtrează operele de artă bazate pe textul introdus
-            List<ArtWork> filteredArtworks = artworks.stream()
-                    .filter(artwork -> artwork.getArtist().toLowerCase().contains(searchText.toLowerCase()) || artwork.getTitle().toLowerCase().contains(searchText.toLowerCase()))
-                    .collect(Collectors.toList());
-            updateList(filteredArtworks);
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Eroare la filtrarea operelor de artă: " + e.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
-        }
+    public void setList1(JList<String> list1) {
+        this.list1 = list1;
     }
 
-    private void updateList(List<ArtWork> artworks) {
-        listModel.clear();
-        for (ArtWork artwork : artworks) {
-            listModel.addElement(artwork.getArtist() + " - " + artwork.getTitle());
-        }
+    public void setListModel(DefaultListModel<String> listModel) {
+        this.listModel = listModel;
+        list1.setModel(this.listModel);
     }
+    public void setTextField1(String textField1) {
+        this.textField1.setText(textField1);
+    }
+
+    public void setCautaButton(JButton cautaButton) {
+        this.cautaButton = cautaButton;
+    }
+
+    public JList<String> getList1() {
+        return list1;
+    }
+
+    public DefaultListModel<String> getListModel() {
+        return listModel;
+    }
+
+    public String getTextField1() {
+        return textField1.getText();
+    }
+
+    public JButton getCautaButton() {
+        return cautaButton;
+    }
+
+
 }

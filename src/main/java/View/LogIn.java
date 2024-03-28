@@ -1,19 +1,23 @@
 package View;
 
-import Auth.UserAuth;
+import Presenter.ILogInUI;
+import Presenter.LogInPresenter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class LogIn extends JFrame {
+public class LogIn extends JFrame implements ILogInUI {
     private JTextField textField1;
-    private JButton logInButton;
     private JPasswordField passwordField1;
-    private String userType; // "angajat" sau "admin"
+    private JButton logInButton;
+    private String userType;
+    private LogInPresenter logInPresenter;
 
     public LogIn(String userType) {
-        this.userType = userType; // Adaugă acest rând
+        logInPresenter = new LogInPresenter(this);
+        this.userType = userType;
         setTitle("Autentificare");
         setSize(300, 200);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -28,44 +32,41 @@ public class LogIn extends JFrame {
         logInButton = new JButton("Log In");
         add(logInButton);
 
-        // Aici poți adăuga logica pentru butonul de Log In
-        logInButton.addActionListener(e -> {
-            String username = textField1.getText();
-            String password = new String(passwordField1.getPassword());
+        logInButton.addActionListener(attemptLogin());
+    }
 
-            // Aici poți adăuga verificarea autentificării
-            System.out.println("Încercare de logare...");
-
-            // Presupunem că există o clasă UserAuth pentru autentificare
-            boolean isAuthenticated = UserAuth.authenticate(username, password, userType);
-            System.out.println(isAuthenticated);
-
-            if (isAuthenticated) {
-                if ("angajat".equals(userType)) {
-                    EventQueue.invokeLater(() -> {
-                        try {
-                            EmployeeUI employeeUI = new EmployeeUI();
-                            employeeUI.setVisible(true);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                            JOptionPane.showMessageDialog(null, "Eroare la deschiderea ferestrei de angajat: " + ex.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
-                        }
-                    });
-                } else if ("admin".equals(userType)) {
-                    EventQueue.invokeLater(() -> {
-                        try {
-                            AdminUI adminUI = new AdminUI();
-                            adminUI.setVisible(true);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                            JOptionPane.showMessageDialog(null, "Eroare la deschiderea ferestrei de admin: " + ex.getMessage(), "Eroare", JOptionPane.ERROR_MESSAGE);
-                        }
-                    });
-                }
-
-            } else {
-                JOptionPane.showMessageDialog(LogIn.this, "Autentificare eșuată", "Eroare", JOptionPane.ERROR_MESSAGE);
+    public ActionListener attemptLogin()
+    {
+        ActionListener e = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                logInPresenter.attemptLogin();
             }
-        });
+        };
+        return e;
+    }
+
+    public String getTextField1() {
+        return textField1.getText();
+    }
+
+    public String getPasswordField1() {
+        return passwordField1.getText();
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setTextField1(String textField1) {
+        this.textField1.setText(textField1);
+    }
+
+    public void setPasswordField1(String passwordField1) {
+        this.passwordField1.setText(passwordField1);
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
     }
 }

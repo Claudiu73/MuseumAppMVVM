@@ -19,6 +19,7 @@ public class UserRepository implements IUser{
             statement.setString(2, user.getPassword());
             statement.setString(3, user.getUserType());
             statement.executeUpdate();
+            System.out.println("User adaugat cu succes.");
         } catch (SQLException e) {
             throw new DAOException("Error adding user", e);
         }
