@@ -2,7 +2,7 @@ package View;
 
 import Presenter.AdminPresenter;
 import Presenter.IAdminUI;
-
+import Presenter.UsersFilterPresenter;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -11,104 +11,133 @@ import java.awt.event.ActionListener;
 public class AdminUI extends JFrame implements IAdminUI {
     private JList<String> list1;
     private JList<String> list2;
-    private JTextField textField1, textField2, textField3, textField4;
-    private JButton adaugaButton, stergeButton, cautaButton, actualizeazaButton, cautaOperaButton;
+    private JTextField textField1, textField2, textField3;
+    private JButton adaugaButton, stergeButton, cautaButton, actualizeazaButton, filtruOpereButton;
+    private JButton filtrareUsersButton;
     private DefaultListModel<String> listModel, listModel1;
     private AdminPresenter adminPresenter;
+    private JFrame frame;
+    private JPanel panel;
 
     public AdminUI() {
         adminPresenter = new AdminPresenter(this);
         listModel = new DefaultListModel<>();
         listModel1 = new DefaultListModel<>();
-        initializeUI();
+        frame = new JFrame("Interfață Admin");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+        frame.setLocationRelativeTo(null);
+        createAndShowUI();
         adminPresenter.fetchAndDisplayArtworks();
         adminPresenter.fetchAndDisplayUsers();
     }
 
-    private void initializeUI() {
-        setTitle("Interfață Admin");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(4,4,4, 4);
+    private void createAndShowUI() {
+        panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                ImageIcon icon = new ImageIcon("C:\\Users\\sirbu\\Desktop\\Cauta\\Faculta 3.2\\PS\\MuseumApp\\FundalAdmin.png");
+                g.drawImage(icon.getImage(), 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+        panel.setLayout(null);
 
-        listModel = new DefaultListModel<>();
-        list1.setModel(listModel);
+        JLabel titleLabel = new JLabel("Servicii Admin", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Times New Roman", Font.BOLD, 24));
+        titleLabel.setForeground(Color.BLACK);
+        titleLabel.setBounds(150, 10, 500, 30);
+        panel.add(titleLabel);
 
-        listModel1 = new DefaultListModel<>();
-        list2.setModel(listModel1);
+        JLabel UNLabel = new JLabel("UN: ", SwingConstants.HORIZONTAL);
+        UNLabel.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+        UNLabel.setForeground(Color.BLACK);
+        UNLabel.setBounds(65,135, 500, 30);
+        panel.add(UNLabel);
 
-        initializeLists(gbc);
-        initializeTextFieldsAndLabels(gbc);
-        initializeButtonsCentered(gbc);
+        JLabel PWLabel = new JLabel("PW: ", SwingConstants.HORIZONTAL);
+        PWLabel.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+        PWLabel.setForeground(Color.BLACK);
+        PWLabel.setBounds(65,170, 500, 30);
+        panel.add(PWLabel);
 
+        JLabel UTLabel = new JLabel("UT: ", SwingConstants.HORIZONTAL);
+        UTLabel.setFont(new Font("Times New Roman", Font.PLAIN, 12));
+        UTLabel.setForeground(Color.BLACK);
+        UTLabel.setBounds(65,205, 500, 30);
+        panel.add(UTLabel);
 
-        pack();
-        setLocationRelativeTo(null);
+        initializeUI();
+        frame.setContentPane(panel);
+        frame.setVisible(true);
     }
 
-    private void initializeLists(GridBagConstraints gbc) {
+    private void initializeUI() {
         list1 = new JList<>(listModel);
         JScrollPane scrollPaneArtworks = new JScrollPane(list1);
+        scrollPaneArtworks.setBounds(20, 165, 250, 200);
 
-        list2 = new JList<>();
+        list2 = new JList<>(listModel1);
         JScrollPane scrollPaneUsers = new JScrollPane(list2);
+        scrollPaneUsers.setBounds(520, 165, 250, 200);
 
-        gbc.gridx = 0; gbc.gridy = 0; gbc.gridheight = 5;
-        gbc.weightx = 0.25; gbc.weighty = 1.0; gbc.fill = GridBagConstraints.BOTH;
-        add(scrollPaneArtworks, gbc);
+        textField1 = new JTextField();
+        textField1.setBounds(330, 135, 150, 25);
+        textField2 = new JTextField();
+        textField2.setBounds(330, 170, 150, 25);
+        textField3 = new JTextField();
+        textField3.setBounds(330, 205, 150, 25);
 
-        gbc.gridx = 4;
-        gbc.weightx = 0.25;
-        add(scrollPaneUsers, gbc);
-
-        gbc.gridheight = 1; gbc.weightx = 0;
-    }
-
-    private void initializeTextFieldsAndLabels(GridBagConstraints gbc) {
-        String[] labels = {"Username:", "Password:", "Type:", "Lista Opere:"};
-        JTextField[] textFields = {textField1 = new JTextField(20), textField2 = new JTextField(20),
-                textField3 = new JTextField(20), textField4 = new JTextField(20)};
-
-        for (int i = 0; i < labels.length; i++) {
-            gbc.gridx = 1;
-            gbc.gridy = i;
-            add(new JLabel(labels[i]), gbc);
-
-            gbc.gridx = 2;
-            gbc.gridwidth = 2;
-            add(textFields[i], gbc);
-        }
-    }
-
-    private void initializeButtonsCentered(GridBagConstraints gbc) {
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        Color orangeBrown = new Color(238, 155, 69);
 
         adaugaButton = new JButton("Adaugă");
+        adaugaButton.setBounds(300, 275, 90, 25);
+        adaugaButton.setBackground(orangeBrown);
+
         stergeButton = new JButton("Șterge");
+        stergeButton.setBounds(400, 275, 90, 25);
+        stergeButton.setBackground(orangeBrown);
+
         cautaButton = new JButton("Caută User");
+        cautaButton.setBounds(300, 310, 90, 25);
+        cautaButton.setBackground(orangeBrown);
+
         actualizeazaButton = new JButton("Actualizează");
-        cautaOperaButton = new JButton("Caută Opera");
+        actualizeazaButton.setBounds(400, 310, 90, 25);
+        actualizeazaButton.setBackground(orangeBrown);
 
+        filtruOpereButton = new JButton("Filtrare Lista Opere");
+        filtruOpereButton.setBounds(300, 345, 190, 25);
+        filtruOpereButton.setBackground(orangeBrown);
 
-        buttonPanel.add(adaugaButton);
-        adaugaButton.addActionListener(onAddUserClicked());
-        buttonPanel.add(stergeButton);
-        stergeButton.addActionListener(addDeleteUserListener());
-        buttonPanel.add(cautaButton);
-        cautaButton.addActionListener(addSearchUserListener());
-        buttonPanel.add(actualizeazaButton);
-        actualizeazaButton.addActionListener(fetchAndDisplayUsers());
-        buttonPanel.add(cautaOperaButton);
-        cautaOperaButton.addActionListener(filterArtworks());
+        filtrareUsersButton = new JButton("Filtrare Lista Users");
+        filtrareUsersButton.setBounds(300, 380, 190, 25);
+        filtrareUsersButton.setBackground(orangeBrown);
 
-        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 5;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(buttonPanel, gbc);
+        panel.add(scrollPaneArtworks);
+        panel.add(scrollPaneUsers);
+        panel.add(textField1);
+        panel.add(textField2);
+        panel.add(textField3);
+        panel.add(adaugaButton);
+        panel.add(stergeButton);
+        panel.add(cautaButton);
+        panel.add(actualizeazaButton);
+        panel.add(filtruOpereButton);
+        panel.add(filtrareUsersButton);
+
+        addEventHandlers();
     }
 
 
+    private void addEventHandlers() {
+        adaugaButton.addActionListener(onAddUserClicked());
+        stergeButton.addActionListener(addDeleteUserListener());
+        cautaButton.addActionListener(addSearchUserListener());
+        actualizeazaButton.addActionListener(onUpdateUserButtonClicked());
+        filtruOpereButton.addActionListener(e -> openArtWorkListUI());
+        filtrareUsersButton.addActionListener(e -> openUsersFilterUI());
+    }
     public ActionListener onAddUserClicked()
     {
         ActionListener e = new ActionListener() {
@@ -142,23 +171,13 @@ public class AdminUI extends JFrame implements IAdminUI {
         return e;
     }
 
-    public ActionListener filterArtworks()
-    {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                adminPresenter.filterArtworks();
-            }
-        };
-        return e;
-    }
 
-    public ActionListener fetchAndDisplayUsers()
+    public ActionListener onUpdateUserButtonClicked()
     {
         ActionListener e = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                adminPresenter.fetchAndDisplayUsers();
+                adminPresenter.onUpdateUserButtonClicked();
             }
         };
         return e;
@@ -234,14 +253,17 @@ public class AdminUI extends JFrame implements IAdminUI {
         this.textField3.setText(userType);
     }
 
-    @Override
-    public String getArtWorkFilter() {
-        return textField4.getText();
+    public void showScreen()
+    {
+        frame.setVisible(true);
+    }
+    private void openArtWorkListUI() {
+        ArtWorkListView artWorkListView = new ArtWorkListView();
+        artWorkListView.showScreen();
     }
 
-    @Override
-    public void setArtWorkFilter(String filter) {
-        this.textField4.setText(filter);
+    private void openUsersFilterUI() {
+        UsersFilterUI usersFilterUI = new UsersFilterUI();
+        usersFilterUI.setVisible(true);
     }
-
 }

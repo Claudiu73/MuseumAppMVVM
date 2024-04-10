@@ -3,17 +3,15 @@ package Model;
 public class User {
     protected int id;
     protected String username;
-    protected String password; // În practică, nu vom stoca parolele în text clar
-    protected String userType; // Vizitator, Angajat, Administrator
+    protected String password;
+    protected String userType;
 
-    // Constructor
     public User(String username, String password, String userType) {
         this.username = username;
         this.password = password;
         this.userType = userType;
     }
 
-    // Getters and Setters
     public String getUsername() {
         return username;
     }

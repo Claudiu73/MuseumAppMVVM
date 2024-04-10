@@ -25,9 +25,4 @@ public interface IAdminUI {
     public String getUserTypeField();
     public void setUserTypeField(String userType);
 
-    public String getArtWorkFilter();
-
-
-    public void setArtWorkFilter(String filter);
-
 }

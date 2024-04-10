@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Artworks>
+    <ArtWork>
+        <Title>Fata cu cercel de perla</Title>
+        <Artist>Johannes Vermeer</Artist>
+        <Year>1665</Year>
+        <Type>Pictura</Type>
+    </ArtWork>
+    <ArtWork>
+        <Title>Nasterea lui Venus</Title>
+        <Artist>Sandro Botticelli</Artist>
+        <Year>1486</Year>
+        <Type>Pictura</Type>
+    </ArtWork>
+    <ArtWork>
+        <Title>Noapte instelata</Title>
+        <Artist>Vincent Van Gogh</Artist>
+        <Year>1889</Year>
+        <Type>Pictura</Type>
+    </ArtWork>
+    <ArtWork>
+        <Title>Tavanul Capela Sixtina</Title>
+        <Artist>Michelangelo</Artist>
+        <Year>1512</Year>
+        <Type>Pictura</Type>
+    </ArtWork>
+</Artworks>

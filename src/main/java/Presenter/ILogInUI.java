@@ -16,4 +16,5 @@ public interface ILogInUI {
 
     public void setUserType(String userType);
 
+    public void showScreen();
 }

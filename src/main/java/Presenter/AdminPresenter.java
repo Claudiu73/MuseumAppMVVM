@@ -39,6 +39,7 @@ public class AdminPresenter {
         try {
             userRepository.addUser(newUser);
             showMessageSucces("Utilizator adăugat cu succes.");
+            fetchAndDisplayUsers();
         } catch (DAOException ex) {
             System.out.println("Eroare.");
             showMessageError("Eroare la adăugarea utilizatorului");
@@ -60,6 +61,42 @@ public class AdminPresenter {
             showMessageError("Eroare la actualizarea listei de utilizatori.");
             e.printStackTrace();
         }
+    }
+
+    public void onUpdateUserButtonClicked()
+    {
+        String username = view.getUsernameField().trim();
+        String password = view.getPasswordField().trim();
+        String type = view.getUserTypeField().trim();
+
+        User userToBeUpdated;
+        try{
+            userToBeUpdated = userRepository.getUserByUsername(username);
+        }
+        catch(DAOException e)
+        {
+            showMessageError("Eroare la cautarea username-ului");
+            return;
+        }
+
+        if(userToBeUpdated != null)
+        {
+            userToBeUpdated.setPassword(password);
+            userToBeUpdated.setUserType(type);
+
+            try{
+                userRepository.updateUser(userToBeUpdated);
+                showMessageSucces("Actualizarea a fost facuta cu succes.");
+                fetchAndDisplayUsers();
+            }
+            catch(DAOException e) {
+                showMessageError("Actualizarea nu s-a putut realiza.");
+                e.printStackTrace();
+            }
+        }else
+            {
+                showMessageError("Username-ul nu a fost gasit.");
+            }
     }
 
     public void fetchAndDisplayArtworks()
@@ -102,6 +139,7 @@ public class AdminPresenter {
                 userRepository.deleteUser(username);
                 showMessageSucces("Utilizatorul a fost șters cu succes.");
             }
+            fetchAndDisplayUsers();
         }
         catch (DAOException e) {
             throw new RuntimeException(e);
@@ -130,33 +168,6 @@ public class AdminPresenter {
             showMessageError("Eroare la căutarea utilizatorului.");
         }
     }
-
-    public void filterArtworks() {
-        String searchText = view.getArtWorkFilter().trim();
-
-        try {
-            ArtWorkRepository artWorkRepository = new ArtWorkRepository();
-            List<ArtWork> allArtworks = artWorkRepository.getAllArtworks();
-
-            List<ArtWork> filteredArtworks = allArtworks.stream()
-                    .filter(artwork -> artwork.getTitle().toLowerCase().contains(searchText.toLowerCase()) ||
-                            artwork.getArtist().toLowerCase().contains(searchText.toLowerCase()))
-                    .collect(Collectors.toList());
-            updateList(filteredArtworks);
-        } catch (Exception e) {
-            e.printStackTrace();
-            showMessageError("Eroare la filtrarea operelor de artă");
-        }
-    }
-
-    private void updateList(List<ArtWork> artworks) {
-        DefaultListModel<String> listModel = new DefaultListModel<>();
-        for (ArtWork artwork : artworks) {
-            listModel.addElement(artwork.toString());
-        }
-        view.setArtWorksList(listModel);
-    }
-
     public int showMessageYesOrNo(String message) {
         return JOptionPane.showConfirmDialog((Component) view, message, "Confirmare ștergere", JOptionPane.YES_NO_OPTION);
     }

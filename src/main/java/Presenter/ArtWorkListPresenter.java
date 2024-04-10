@@ -2,6 +2,8 @@ package Presenter;
 
 import Model.ArtWork;
 import Repo.ArtWorkRepository;
+import Repo.DAOException;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
@@ -37,41 +39,65 @@ public class ArtWorkListPresenter {
     }
 
     public void filterArtworks() {
-        String searchText = view.getTextField1().trim();
-
         try {
-            ArtWorkRepository artWorkRepository = new ArtWorkRepository();
             List<ArtWork> allArtworks = artWorkRepository.getAllArtworks();
+            DefaultListModel<String> model = new DefaultListModel<>();
+
+            String titleFilter = view.getTextField1().trim();
+            String artistFilter = view.getTextField2().trim();
+            String yearFilter = view.getTextField3().trim();
+            String typeFilter = view.getTextField4().trim();
 
             List<ArtWork> filteredArtworks = allArtworks.stream()
-                    .filter(artwork -> artwork.getTitle().toLowerCase().contains(searchText.toLowerCase()) ||
-                            artwork.getArtist().toLowerCase().contains(searchText.toLowerCase()))
+                    .filter(artwork -> artwork.getTitle().equalsIgnoreCase(titleFilter) || titleFilter.isEmpty())
+                    .filter(artwork -> artwork.getArtist().equalsIgnoreCase(artistFilter) || artistFilter.isEmpty())
+                    .filter(artwork -> String.valueOf(artwork.getYear()).equals(yearFilter) || yearFilter.isEmpty())
+                    .filter(artwork -> artwork.getType().equalsIgnoreCase(typeFilter) || typeFilter.isEmpty())
                     .collect(Collectors.toList());
-            updateList(filteredArtworks);
 
-        } catch (Exception e) {
+            for (ArtWork artwork : filteredArtworks) {
+                model.addElement(artwork.toString());
+            }
+
+            view.setListModel(model);
+        } catch (DAOException e) {
+            showError("Eroare la filtrarea operelor de artă: " + e.getMessage());
+        }
+    }
+
+    public void onSearchButtonClicked() {
+        String searchTitle = view.getTextField1().trim();
+        if (searchTitle.isEmpty()) {
+            view.setTextField1("Trebuie completat titlul operei de arta!");
+            return;
+        }
+        try {
+            ArtWork searchedArtwork = artWorkRepository.getArtworkByName(searchTitle);
+            if (searchedArtwork == null) {
+                showError("Eroare la căutarea operei de artă: " + view.getTextField1());
+            } else {
+                String details = "Titlu: " + searchedArtwork.getTitle() +
+                        "\nArtist: " + searchedArtwork.getArtist() +
+                        "\nAn: " + searchedArtwork.getYear() +
+                        "\nTip: " + searchedArtwork.getType();
+                showArtWorkFoundDetails(details);
+            }
+        } catch (DAOException e) {
+            showError("Eroare la căutarea operei de artă");
             e.printStackTrace();
-            showError("Eroare la filtrarea operelor de artă");
         }
     }
 
-    private void updateList(List<ArtWork> artworks) {
-        DefaultListModel<String> listModel = new DefaultListModel<>();
-        //listModel.clear();
-        for (ArtWork artwork : artworks) {
-            listModel.addElement(artwork.toString());
-
-        }
-
-        view.setListModel(listModel);
-        System.out.println("Am ajuns pana aiciii");
-    }
     public void setView(IArtWorkUI view) {
         this.view = view;
     }
 
     public void showError(String message) {
         JOptionPane.showMessageDialog((Component) view, message, "Eroare", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void showArtWorkFoundDetails(String details) {
+        JOptionPane.showMessageDialog((Component) view, details, "Detalii Opera de Artă", JOptionPane.INFORMATION_MESSAGE);
     }
 
 }

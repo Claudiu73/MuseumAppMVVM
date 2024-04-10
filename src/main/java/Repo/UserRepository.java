@@ -39,13 +39,12 @@ public class UserRepository implements IUser{
 
     @Override
     public void updateUser(User user) throws DAOException {
-        String sql = "UPDATE users SET username = ?, password = ?, usertype = ? WHERE id = ?";
+        String sql = "UPDATE users SET password = ?, usertype = ? WHERE username = ?";
         try (Connection conn = ConnectionBD.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, user.getUsername());
-            statement.setString(2, user.getPassword());
-            statement.setString(3, user.getUserType());
-            statement.setInt(4, user.getId());
+            statement.setString(3, user.getUsername());
+            statement.setString(1, user.getPassword());
+            statement.setString(2, user.getUserType());
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new DAOException("Error updating user", e);

@@ -8,7 +8,6 @@ public class Main {
         EventQueue.invokeLater(() -> {
             try {
                 MainScreen mainScreen = new MainScreen();
-                mainScreen.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();
             }

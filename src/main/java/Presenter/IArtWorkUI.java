@@ -12,7 +12,7 @@ public interface IArtWorkUI {
 
     public void setTextField1(String textField1);
 
-    public void setCautaButton(JButton cautaButton) ;
+    public void setAnButton(JButton anButton) ;
 
 
     public JList<String> getList1() ;
@@ -21,7 +21,20 @@ public interface IArtWorkUI {
 
     public String getTextField1() ;
 
-    public JButton getCautaButton();
+    public JButton getAnButton();
 
+    public String getTextField2();
+    public String getTextField3();
+
+    public String getTextField4();
+
+    public void setTextField2(String textField2);
+
+    public void setTextField3(String textField3);
+
+    public void setTextField4(String textField4);
+
+    public void setPresenter(ArtWorkListPresenter presenter);
+    public void showScreen();
 
 }

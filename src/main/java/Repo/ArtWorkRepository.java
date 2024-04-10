@@ -82,30 +82,28 @@ public class ArtWorkRepository implements IArtWork{
 
     @Override
     public void updateArtwork(ArtWork artwork) throws DAOException {
-
-        String sql = "UPDATE artworks SET title = ?, artist = ?, year = ?, type = ? WHERE id = ?";
+        String sql = "UPDATE artworks SET artist = ?, year = ?, type = ? WHERE title = ?";
 
         try (Connection conn = ConnectionBD.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
 
-            statement.setString(1, artwork.getTitle());
-            statement.setString(2, artwork.getArtist());
-            statement.setInt(3, artwork.getYear());
-            statement.setString(4, artwork.getType());
-            statement.setInt(5, artwork.getId());
-
+            statement.setString(1, artwork.getArtist());
+            statement.setInt(2, artwork.getYear());
+            statement.setString(3, artwork.getType());
+            statement.setString(4, artwork.getTitle());
 
             int rowsUpdated = statement.executeUpdate();
 
             if (rowsUpdated > 0) {
                 System.out.println("Opera de artă a fost actualizată cu succes.");
             } else {
-                System.out.println("Nu s-a găsit opera de artă cu ID-ul specificat pentru actualizare.");
+                System.out.println("Nu s-a găsit opera de artă cu titlul specificat pentru actualizare.");
             }
         } catch (SQLException e) {
             throw new DAOException("Error updating artwork", e);
         }
     }
+
 
 
     @Override

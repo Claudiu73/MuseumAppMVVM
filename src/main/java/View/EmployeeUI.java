@@ -5,171 +5,120 @@ import Presenter.IEmployeeUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class EmployeeUI extends JFrame implements IEmployeeUI {
     private EmployeePresenter employeePresenter;
     private JList<String> list1;
     private DefaultListModel<String> listModel;
     private JTextField textField1, textField2, textField3, textField4;
-    private JButton adaugaButton, stergeButton, actualizeazaButton, cautaButton;
+    private JButton adaugaButton, stergeButton, actualizeazaButton, cautaButton, generareCsvButton, generareJSONButton;
+    private JButton generareXMLButton;
+    private JButton generareDocButton;
+    private JFrame frame;
+    private JPanel panel;
 
 
     public EmployeeUI() {
         employeePresenter = new EmployeePresenter(this);
-        initializeUI();
+        frame = new JFrame("Servicii Angajat");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+        frame.setLocationRelativeTo(null);
+
+        panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                ImageIcon icon = new ImageIcon("C:\\Users\\sirbu\\Desktop\\Cauta\\Faculta 3.2\\PS\\MuseumApp\\FundalAngajat.png");
+                g.drawImage(icon.getImage(), 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+        panel.setLayout(null);
+
+        JLabel titleLabel = new JLabel("Servicii Angajat", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Times New Roman", Font.BOLD, 24));
+        titleLabel.setForeground(Color.BLACK);
+        titleLabel.setBounds(150, 10, 500, 30);
+        panel.add(titleLabel);
+
+        initializeComponents(panel);
         employeePresenter.fetchAndDisplayArtworks();
+        frame.setContentPane(panel);
+        frame.setVisible(true);
     }
 
-    private void initializeUI() {
-        setTitle("Servicii Angajat");
-        setSize(800, 400);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-
+    private void initializeComponents(JPanel panel) {
         listModel = new DefaultListModel<>();
         list1 = new JList<>(listModel);
         JScrollPane scrollPane = new JScrollPane(list1);
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridheight = 4;
-        gbc.weightx = 0.5;
-        gbc.weighty = 1.0;
-        add(scrollPane, gbc);
+        scrollPane.setBounds(520, 160, 210, 220);
+        panel.add(scrollPane);
 
-        JLabel lblTitlu = new JLabel("Titlu");
-        gbc.gridheight = 1;
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.weightx = 0;
-        gbc.insets = new Insets(10,10,10,10);
-        add(lblTitlu, gbc);
+        int yPosition = 245;
+        Color color = new Color(206, 193, 193);
 
-        textField1 = new JTextField(20);
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.weightx = 0.5;
-        add(textField1, gbc);
+        textField1 = new JTextField();
+        textField2 = new JTextField();
+        textField3 = new JTextField();
+        textField4 = new JTextField();
+        adaugaButton = new JButton("Adaugă");
+        stergeButton = new JButton("Șterge");
+        actualizeazaButton = new JButton("Actualizează");
+        cautaButton = new JButton("Caută");
+        generareCsvButton = new JButton("Generare CSV");
+        generareJSONButton = new JButton("Generare JSON");
+        generareXMLButton = new JButton("Generare XML");
+        generareDocButton = new JButton("Generare DOC");
 
-        JLabel lblArtist = new JLabel("Artist");
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0;
-        add(lblArtist, gbc);
 
-        textField2 = new JTextField(20);
-        gbc.gridx = 2;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.weightx = 0.5;
-        add(textField2, gbc);
+        adaugaButton.setBackground(color);
+        stergeButton.setBackground(color);
+        actualizeazaButton.setBackground(color);
+        cautaButton.setBackground(color);
+        generareCsvButton.setBackground(color);
+        generareJSONButton.setBackground(color);
+        generareXMLButton.setBackground(color);
+        generareDocButton.setBackground(color);
 
-        JLabel lblAn = new JLabel("An");
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0;
-        add(lblAn, gbc);
+        addLabeledField(panel, "Titlu:", textField1, 233, yPosition);
+        addLabeledField(panel, "Artist:", textField2, 233, yPosition + 40);
+        addLabeledField(panel, "An:", textField3, 233, yPosition + 80);
+        addLabeledField(panel, "Tipul:", textField4, 233, yPosition + 120);
 
-        textField3 = new JTextField(20);
-        gbc.gridx = 2;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.weightx = 0.5;
-        add(textField3, gbc);
+        adaugaButton.setBounds(220, yPosition + 200, 122, 30);
+        stergeButton.setBounds(350, yPosition + 200, 122, 30);
+        actualizeazaButton.setBounds(480, yPosition + 200, 122, 30);
+        cautaButton.setBounds(610, yPosition + 200, 122, 30);
+        generareCsvButton.setBounds(220, yPosition + 250, 122, 30);
+        generareJSONButton.setBounds(350,yPosition+250, 122, 30);
+        generareXMLButton.setBounds(480, yPosition+250, 122, 30);
+        generareDocButton.setBounds(610, yPosition+250, 122, 30);
 
-        JLabel lblTip = new JLabel("Tipul");
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0;
-        add(lblTip, gbc);
+        panel.add(adaugaButton);
+        panel.add(stergeButton);
+        panel.add(actualizeazaButton);
+        panel.add(cautaButton);
+        panel.add(generareCsvButton);
+        panel.add(generareJSONButton);
+        panel.add(generareXMLButton);
+        panel.add(generareDocButton);
 
-        textField4 = new JTextField(20);
-        gbc.gridx = 2;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        gbc.weightx = 0.5;
-        add(textField4, gbc);
-
-        adaugaButton = new JButton("Adauga");
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        gbc.gridwidth = 1;
-        add(adaugaButton, gbc);
-        adaugaButton.addActionListener(onAddButtonClicked());
-
-        stergeButton = new JButton("Sterge");
-        gbc.gridx = 2;
-        gbc.gridy = 4;
-        add(stergeButton, gbc);
-        stergeButton.addActionListener(onDeleteButtonClicked());
-
-        actualizeazaButton = new JButton("Actualizeaza");
-        gbc.gridx = 3;
-        gbc.gridy = 4;
-        add(actualizeazaButton, gbc);
-        actualizeazaButton.addActionListener(fetchAndDisplayArtworks());
-
-        cautaButton = new JButton("Cauta");
-        gbc.gridx = 4;
-        gbc.gridy = 4;
-        add(cautaButton, gbc);
-        cautaButton.addActionListener(onSearchButtonClicked());
-
-        pack();
-        setLocationRelativeTo(null);
+        adaugaButton.addActionListener(e -> employeePresenter.onAddButtonClicked());
+        stergeButton.addActionListener(e -> employeePresenter.onDeleteButtonClicked());
+        actualizeazaButton.addActionListener(e -> employeePresenter.onUpdateButtonClicked());
+        cautaButton.addActionListener(e -> employeePresenter.onSearchButtonClicked());
+        generareCsvButton.addActionListener(e -> employeePresenter.onGenerateCsvButtonClicked());
+        generareJSONButton.addActionListener(e -> employeePresenter.onGenerateJSONButtonClicked());
+        generareXMLButton.addActionListener(e -> employeePresenter.onGenerateXMLButtonClicked());
+        generareDocButton.addActionListener(e -> employeePresenter.onGenerateSimpleDocButtonClicked());
     }
 
-
-    public ActionListener onAddButtonClicked()
-    {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                employeePresenter.onAddButtonClicked();
-            }
-        };
-        return e;
-    }
-
-    public ActionListener onDeleteButtonClicked()
-    {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                employeePresenter.onDeleteButtonClicked();
-            }
-        };
-        return e;
-    }
-
-    public ActionListener fetchAndDisplayArtworks()
-    {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                employeePresenter.fetchAndDisplayArtworks();
-            }
-        };
-        return e;
-    }
-
-
-    public ActionListener onSearchButtonClicked()
-    {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                employeePresenter.onSearchButtonClicked();
-            }
-        };
-        return e;
+    private void addLabeledField(JPanel panel, String label, JTextField textField, int x, int y) {
+        JLabel jLabel = new JLabel(label);
+        jLabel.setBounds(x, y, 50, 30);
+        textField.setBounds(x + 60, y, 150, 30);
+        panel.add(jLabel);
+        panel.add(textField);
     }
 
 

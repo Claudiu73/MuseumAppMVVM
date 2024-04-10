@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Fata cu cercel de perla",
+    "artist": "Johannes Vermeer",
+    "year": 1665,
+    "type": "Pictura"
+  },
+  {
+    "title": "Nasterea lui Venus",
+    "artist": "Sandro Botticelli",
+    "year": 1486,
+    "type": "Pictura"
+  },
+  {
+    "title": "Noapte instelata",
+    "artist": "Vincent Van Gogh",
+    "year": 1889,
+    "type": "Pictura"
+  },
+  {
+    "title": "Tavanul Capela Sixtina",
+    "artist": "Michelangelo",
+    "year": 1512,
+    "type": "Pictura"
+  }
+]

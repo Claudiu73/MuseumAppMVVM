@@ -5,6 +5,7 @@ import Repo.UserRepository;
 import Model.User;
 import View.AdminUI;
 import View.EmployeeUI;
+import View.LogIn;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +20,7 @@ public class LogInPresenter {
 
     public LogInPresenter(ILogInUI view)
     {
-        this.view =view;
+        this.view = view;
         this.userRepository = new UserRepository();
     }
     public static boolean authenticate(String username, String password, String userType) {
@@ -74,7 +75,7 @@ public class LogInPresenter {
         EventQueue.invokeLater(() -> {
             try {
                 AdminUI adminUI = new AdminUI();
-                adminUI.setVisible(true);
+                adminUI.showScreen();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 showMessageError("Eroare la conectarea Admin-ului");
@@ -83,7 +84,11 @@ public class LogInPresenter {
     }
 
     public void showMessageError(String message) {
-        JOptionPane.showMessageDialog((Component) view, message, "Eroare!", JOptionPane.ERROR_MESSAGE);
+        if (view != null) {
+            JOptionPane.showMessageDialog((Component) view, message, "Eroare!", JOptionPane.ERROR_MESSAGE);
+        } else {
+            System.out.println("Error: view is not initialized.");
+        }
     }
 
 }
