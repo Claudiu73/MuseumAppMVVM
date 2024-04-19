@@ -1,23 +1,20 @@
 package View;
 
-import Presenter.ILogInUI;
-import Presenter.LogInPresenter;
+import Repo.UserRepository;
+import ViewModel.LogInViewModel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
-public class LogIn implements ILogInUI {
+public class LogIn {
     private JTextField textField1;
     private JPasswordField passwordField1;
     private JButton logInButton;
-    private String userType;
     private JFrame frame;
-    private LogInPresenter logInPresenter;
+    private LogInViewModel viewModel;
 
-    public LogIn(String userType) {
-        logInPresenter = new LogInPresenter(this);
-        this.userType = userType;
+    public LogIn(LogInViewModel viewModel, UserRepository userRepository) {
+        this.viewModel = viewModel;  // Folosește instanța pasată, nu crea una nouă
         initializeUI();
     }
 
@@ -38,6 +35,21 @@ public class LogIn implements ILogInUI {
         };
         panel.setLayout(null);
 
+        setupLabelsAndFields(panel);
+
+        logInButton = new JButton("Log In");
+        logInButton.setBounds(100, 120, 100, 30);
+        logInButton.setBackground(new Color(232, 181, 17, 150));
+        logInButton.setOpaque(true);
+        logInButton.setBorderPainted(false);
+        logInButton.addActionListener(e -> performLogin());
+        panel.add(logInButton);
+
+        frame.setContentPane(panel);
+        frame.setVisible(true);
+    }
+
+    private void setupLabelsAndFields(JPanel panel) {
         JLabel usernameLabel = new JLabel("Username:");
         usernameLabel.setBounds(50, 10, 200, 20);
         usernameLabel.setForeground(Color.WHITE);
@@ -57,56 +69,16 @@ public class LogIn implements ILogInUI {
         passwordField1 = new JPasswordField(20);
         passwordField1.setBounds(50, 80, 200, 30);
         panel.add(passwordField1);
-
-        logInButton = new JButton("Log In");
-        logInButton.setBounds(100, 120, 100, 30);
-        logInButton.setBackground(new Color(232, 181, 17, 150));
-        logInButton.setOpaque(true);
-        logInButton.setBorderPainted(false);
-        logInButton.addActionListener(this::attemptLogin);
-        panel.add(logInButton);
-
-        frame.setContentPane(panel);
-        frame.setVisible(true);
     }
 
-    private void attemptLogin(ActionEvent e) {
-        logInPresenter.attemptLogin();
-        frame.dispose();
+    private void performLogin() {
+        viewModel.setUsername(textField1.getText().trim());
+        viewModel.setPassword(new String(passwordField1.getPassword()).trim());
+        viewModel.initiateLogin();  // Apelarea noii metode pentru a iniția logarea
     }
 
-    @Override
-    public String getTextField1() {
-        return textField1.getText();
-    }
 
-    @Override
-    public String getPasswordField1() {
-        return new String(passwordField1.getPassword());
-    }
-
-    @Override
-    public String getUserType() {
-        return userType;
-    }
-
-    @Override
-    public void setTextField1(String textField1) {
-        this.textField1.setText(textField1);
-    }
-
-    @Override
-    public void setPasswordField1(String passwordField1) {
-        this.passwordField1.setText(passwordField1);
-    }
-
-    @Override
-    public void setUserType(String userType) {
-        this.userType = userType;
-    }
-
-    public void showScreen()
-    {
+    public void showScreen() {
         frame.setVisible(true);
     }
 }

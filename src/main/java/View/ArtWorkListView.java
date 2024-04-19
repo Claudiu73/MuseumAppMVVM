@@ -1,23 +1,23 @@
 package View;
 
-import Presenter.ArtWorkListPresenter;
-import Presenter.IArtWorkUI;
+import ViewModel.ArtWorkListViewModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ArtWorkListView extends JFrame implements IArtWorkUI {
+public class ArtWorkListView extends JFrame {
     private JList<String> list1;
     private DefaultListModel<String> listModel;
     private JTextField textField1, textField2, textField3, textField4;
     private JButton anButton, titluButton, tipButton, artistButton, cautaButton;
     private JFrame frame;
     private JPanel panel;
-    private ArtWorkListPresenter artWorkListPresenter;
+    private ArtWorkListViewModel artWorkListViewModel;
 
     public ArtWorkListView() {
-        artWorkListPresenter = new ArtWorkListPresenter(this);
+        artWorkListViewModel = new ArtWorkListViewModel();
         listModel = new DefaultListModel<>();
         frame = new JFrame("Lista Opere de Arta");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -43,7 +43,7 @@ public class ArtWorkListView extends JFrame implements IArtWorkUI {
 
         frame.setContentPane(panel);
         initializeUI();
-        artWorkListPresenter.fetchAndDisplayArtworks();
+        performListArtWorksForVisitor();
 
         frame.setVisible(true);
     }
@@ -51,8 +51,11 @@ public class ArtWorkListView extends JFrame implements IArtWorkUI {
     private void initializeUI() {
         frame.setLayout(null);
 
+        listModel = new DefaultListModel<>();
         list1 = new JList<>(listModel);
+
         JScrollPane scrollPane = new JScrollPane(list1);
+        artWorkListViewModel.setListModelArts(listModel);
         scrollPane.setBounds(20, 200, 350, 150);
         frame.add(scrollPane);
 
@@ -71,25 +74,25 @@ public class ArtWorkListView extends JFrame implements IArtWorkUI {
         titluButton.setBackground(Color.LIGHT_GRAY);
         titluButton.setBounds(635, 205, 80, 25);
 
-        JLabel labelYearFilter = new JLabel("Filtru an:");
+        JLabel labelYearFilter = new JLabel("Filtru autor:");
         labelYearFilter.setForeground(Color.WHITE);
         labelYearFilter.setBounds(400, 235, 100, 25);
 
         textField2 = new JTextField();
         textField2.setBounds(475, 235, 150, 25);
 
-        anButton = new JButton("An");
+        anButton = new JButton("Autor");
         anButton.setBackground(Color.LIGHT_GRAY);
         anButton.setBounds(635, 235, 80, 25);
 
-        JLabel labelAuthorFilter = new JLabel("Filtru autor:");
+        JLabel labelAuthorFilter = new JLabel("Filtru an:");
         labelAuthorFilter.setForeground(Color.WHITE);
         labelAuthorFilter.setBounds(400, 275, 100, 25);
 
         textField3 = new JTextField();
         textField3.setBounds(475, 275, 150, 25);
 
-        artistButton = new JButton("Autor");
+        artistButton = new JButton("An");
         artistButton.setBackground(Color.LIGHT_GRAY);
         artistButton.setBounds(635, 275, 80, 25);
 
@@ -125,126 +128,59 @@ public class ArtWorkListView extends JFrame implements IArtWorkUI {
         addEventHandlers();
     }
     private void addEventHandlers() {
-        titluButton.addActionListener(onTitleButtonClicked());
-        anButton.addActionListener(onYearButtonClicked());
-        artistButton.addActionListener(onArtistButtonClicked());
-        tipButton.addActionListener(onTypeButtonClicked());
-        cautaButton.addActionListener(onSearchButtonClicked());
+        titluButton.addActionListener(e -> {
+            artWorkListViewModel.setTitle(textField1.getText());
+            performToFilterTitleForVisitor();});
+        anButton.addActionListener(e -> {
+            artWorkListViewModel.setAuthor(textField2.getText());
+            performToFilterAuthorForVisitor();});
+        artistButton.addActionListener(e -> {
+            artWorkListViewModel.setYear(Integer.parseInt(textField3.getText().trim()));
+            performToFilterYearForVisitor();});
+        tipButton.addActionListener(e -> {
+            artWorkListViewModel.setType(textField4.getText());
+            performToFilterTypeForVisitor();});
+        cautaButton.addActionListener(e -> {
+            artWorkListViewModel.setTitle(textField1.getText());
+            performSearchArtWorkByVisitor();
+        });
     }
-    public ActionListener onSearchButtonClicked()
+
+    private void performSearchArtWorkByVisitor()
     {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                artWorkListPresenter.onSearchButtonClicked();
-            }
-        };
-        return e;
+        artWorkListViewModel.SearchArtWorkByVisitor();
     }
-    public ActionListener onTitleButtonClicked()
+
+    private void performListArtWorksForVisitor()
     {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                artWorkListPresenter.filterArtworks();
-            }
-        };
-        return e;
+        artWorkListViewModel.ListArtWorksForVisitor();
     }
 
-    public ActionListener onArtistButtonClicked()
+    private void performToFilterTitleForVisitor() {
+        artWorkListViewModel.setTitle(textField1.getText());
+        artWorkListViewModel.ToFilterTitleForVisitor();
+        list1.setModel(artWorkListViewModel.getListModelArts());
+    }
+
+    private void performToFilterAuthorForVisitor()
     {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                artWorkListPresenter.filterArtworks();
-            }
-        };
-        return e;
+        artWorkListViewModel.setAuthor(textField2.getText());
+        artWorkListViewModel.ToFilterAuthorForVisitor();
+        list1.setModel(artWorkListViewModel.getListModelArts());
     }
 
-    public ActionListener onYearButtonClicked()
+
+    private void performToFilterYearForVisitor()
     {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                artWorkListPresenter.filterArtworks();
-            }
-        };
-        return e;
+        artWorkListViewModel.setYear(Integer.parseInt(textField3.getText()));
+        artWorkListViewModel.ToFilterYearForVisitor();
+        list1.setModel(artWorkListViewModel.getListModelArts());
     }
 
-    public ActionListener onTypeButtonClicked()
+    private void performToFilterTypeForVisitor()
     {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                artWorkListPresenter.filterArtworks();
-            }
-        };
-        return e;
-    }
-
-    public void setList1(JList<String> list1) {
-        this.list1 = list1;
-    }
-
-    public void setListModel(DefaultListModel<String> listModel) {
-        this.list1.setModel(listModel);
-    }
-    public void setTextField1(String textField1) {
-        this.textField1.setText(textField1);
-    }
-
-    public void setAnButton(JButton anButton) {
-        this.anButton = anButton;
-    }
-
-    public JList<String> getList1() {
-        return list1;
-    }
-
-    public DefaultListModel<String> getListModel() {
-        return listModel;
-    }
-
-    public String getTextField1() {
-        return textField1.getText();
-    }
-
-    public JButton getAnButton() {
-        return anButton;
-    }
-
-    public String getTextField2() {
-        return textField2.getText();
-    }
-
-    public String getTextField3() {
-        return textField3.getText();
-    }
-
-    public String getTextField4() {
-        return textField4.getText();
-    }
-
-    public void setTextField2(String textField2) {
-        this.textField2.setText(textField2);
-    }
-
-    public void setTextField3(String textField3) {
-        this.textField3.setText(textField3);
-    }
-
-    public void setTextField4(String textField4) {
-        this.textField4.setText(textField4);
-    }
-
-    public void setPresenter(ArtWorkListPresenter presenter) {
-        this.artWorkListPresenter = presenter;
-    }
-
-    public void showScreen() {
-        frame.setVisible(true);
+        artWorkListViewModel.setType(textField4.getText());
+        artWorkListViewModel.ToFilterTypeForVisitor();
+        list1.setModel(artWorkListViewModel.getListModelArts());
     }
 }

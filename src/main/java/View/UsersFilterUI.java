@@ -1,15 +1,12 @@
 package View;
 
-import Presenter.IUsersFilterUI;
-import Presenter.UsersFilterPresenter;
+import ViewModel.UsersFilterViewModel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 
-public class UsersFilterUI extends JFrame implements IUsersFilterUI {
+public class UsersFilterUI extends JFrame {
     private JList<String> list1;
     private JTextField textField1;
     private JTextField textField2;
@@ -17,15 +14,16 @@ public class UsersFilterUI extends JFrame implements IUsersFilterUI {
     private JButton button1;
     private JButton button2;
     private JButton button3;
-    private UsersFilterPresenter usersFilterPresenter;
+    private UsersFilterViewModel usersFilterViewModel;
     private DefaultListModel<String> listModel;
 
     public UsersFilterUI() {
-        usersFilterPresenter = new UsersFilterPresenter(this);
+        usersFilterViewModel = new UsersFilterViewModel();
         listModel = new DefaultListModel<>();
         initializeUI();
-        usersFilterPresenter.fetchAndDisplayUsers();
+        performLisToBeFiltered();
         this.setVisible(true);
+
     }
 
     private void initializeUI() {
@@ -34,6 +32,9 @@ public class UsersFilterUI extends JFrame implements IUsersFilterUI {
         this.setLayout(new BorderLayout());
 
         list1 = new JList<>(listModel);
+        JScrollPane scrollPane = new JScrollPane(list1);
+        usersFilterViewModel.setListModelUser(listModel);
+        this.add(scrollPane, BorderLayout.CENTER);
         textField1 = new JTextField();
         textField2 = new JTextField();
         textField3 = new JTextField();
@@ -48,88 +49,51 @@ public class UsersFilterUI extends JFrame implements IUsersFilterUI {
         panel.setLayout(new GridLayout(3, 2));
         panel.add(textField1);
         panel.add(button1);
-        button1.addActionListener(onUsernameButtonClicked());
+        button1.addActionListener(e -> {
+            usersFilterViewModel.setUsername(textField1.getText());
+            performToFilterUsernameForAdmin();});
         panel.add(textField2);
         panel.add(button2);
-        button2.addActionListener(onPasswordButtonClicked());
+        button2.addActionListener(e -> {
+                    usersFilterViewModel.setPassword(textField2.getText());
+            performToFilterPasswordForAdmin();});
         panel.add(textField3);
         panel.add(button3);
-        button3.addActionListener(onTypeUserButtonClicked());
+        button3.addActionListener(e -> {
+            usersFilterViewModel.setUserType(textField3.getText());
+            performToFilterUserTypeForAdmin();});
 
         this.add(panel, BorderLayout.SOUTH);
-
         this.pack();
         this.setLocationRelativeTo(null);
     }
 
-    public ActionListener onUsernameButtonClicked()
+    private void performLisToBeFiltered()
     {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                usersFilterPresenter.filterUsers();
-            }
-        };
-        return e;
+        usersFilterViewModel.ListUsersToBeFiltered();
     }
 
-    public ActionListener onPasswordButtonClicked()
+    private void performToFilterUsernameForAdmin()
     {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                usersFilterPresenter.filterUsers();
-            }
-        };
-        return e;
+        usersFilterViewModel.setUsername(textField1.getText());
+        usersFilterViewModel.ToFilterUsernameForAdmin();
+        list1.setModel(usersFilterViewModel.getListModelUser());
     }
 
-    public ActionListener onTypeUserButtonClicked()
+    private void performToFilterPasswordForAdmin()
     {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                usersFilterPresenter.filterUsers();
-            }
-        };
-        return e;
-    }
-    public JList getList1() {
-        return list1;
+        usersFilterViewModel.setPassword(textField2.getText());
+        usersFilterViewModel.ToFilterPasswordForAdmin();
+        list1.setModel(usersFilterViewModel.getListModelUser());
     }
 
-    public String getTextField1() {
-        return textField1.getText();
+    private void performToFilterUserTypeForAdmin()
+    {
+        usersFilterViewModel.setUserType(textField3.getText());
+        usersFilterViewModel.ToFilterUserTypeForAdmin();
+        list1.setModel(usersFilterViewModel.getListModelUser());
+
     }
 
-    public String getTextField2() {
-        return textField2.getText();
-    }
-
-    public String getTextField3() {
-        return textField3.getText();
-    }
-
-    public void setList1(DefaultListModel<String> model) {
-        list1.setModel(model);
-    }
-    public void setTextField1(JTextField textField1) {
-        this.textField1 = textField1;
-    }
-
-    public void setTextField2(JTextField textField2) {
-        this.textField2 = textField2;
-    }
-
-    public void setTextField3(JTextField textField3) {
-        this.textField3 = textField3;
-    }
-
-    public DefaultListModel<String> getUserListModel() {
-        return listModel;
-    }
-    public void setUserListModel(DefaultListModel<String> userListModel) {
-        this.listModel = listModel;
-    }
 
 }

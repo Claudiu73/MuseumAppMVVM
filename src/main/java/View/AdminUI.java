@@ -1,26 +1,25 @@
 package View;
 
-import Presenter.AdminPresenter;
-import Presenter.IAdminUI;
-import Presenter.UsersFilterPresenter;
+import ViewModel.AdminViewModel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class AdminUI extends JFrame implements IAdminUI {
+public class AdminUI extends JFrame{
     private JList<String> list1;
     private JList<String> list2;
     private JTextField textField1, textField2, textField3;
     private JButton adaugaButton, stergeButton, cautaButton, actualizeazaButton, filtruOpereButton;
     private JButton filtrareUsersButton;
     private DefaultListModel<String> listModel, listModel1;
-    private AdminPresenter adminPresenter;
+    private AdminViewModel adminViewModel;
     private JFrame frame;
     private JPanel panel;
 
     public AdminUI() {
-        adminPresenter = new AdminPresenter(this);
+        adminViewModel = new AdminViewModel();
         listModel = new DefaultListModel<>();
         listModel1 = new DefaultListModel<>();
         frame = new JFrame("Interfață Admin");
@@ -28,8 +27,10 @@ public class AdminUI extends JFrame implements IAdminUI {
         frame.setSize(800, 600);
         frame.setLocationRelativeTo(null);
         createAndShowUI();
-        adminPresenter.fetchAndDisplayArtworks();
-        adminPresenter.fetchAndDisplayUsers();
+        adminViewModel.setListModelArt(listModel);
+        adminViewModel.setListModelUser(listModel1);
+        performListArtWorks();
+        performListUsers();
     }
 
     private void createAndShowUI() {
@@ -131,139 +132,67 @@ public class AdminUI extends JFrame implements IAdminUI {
 
 
     private void addEventHandlers() {
-        adaugaButton.addActionListener(onAddUserClicked());
-        stergeButton.addActionListener(addDeleteUserListener());
-        cautaButton.addActionListener(addSearchUserListener());
-        actualizeazaButton.addActionListener(onUpdateUserButtonClicked());
-        filtruOpereButton.addActionListener(e -> openArtWorkListUI());
-        filtrareUsersButton.addActionListener(e -> openUsersFilterUI());
+        adaugaButton.addActionListener(e -> {
+            performAddUser();
+        });
+        stergeButton.addActionListener(e -> {
+            adminViewModel.setUsername(textField1.getText());
+            performDeleteUser();
+        });
+        cautaButton.addActionListener(e -> {
+            adminViewModel.setUsername(textField1.getText());
+            performSearchUser();});
+        actualizeazaButton.addActionListener(e -> {
+            adminViewModel.setUsername(textField1.getText());
+            adminViewModel.setPassword(textField2.getText());
+            adminViewModel.setUserType(textField3.getText());
+            performUpdateUser();});
+        filtruOpereButton.addActionListener(e -> performOpenToFilterListOfArtWorks());
+        filtrareUsersButton.addActionListener(e -> performOpenToFilterUsers());
     }
-    public ActionListener onAddUserClicked()
+
+
+    private void performAddUser()
     {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                adminPresenter.onAddUserClicked();
-            }
-        };
-        return e;
+        adminViewModel.setUsername(textField1.getText().trim());
+        adminViewModel.setPassword(textField2.getText().trim());
+        adminViewModel.setUserType(textField3.getText().trim());
+        adminViewModel.AddUser();
     }
 
-    public ActionListener addDeleteUserListener()
+    private void performDeleteUser()
     {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                adminPresenter.addDeleteUserListener();
-            }
-        };
-        return e;
+        adminViewModel.getUsername();
+        adminViewModel.DeleteUser();
     }
 
-    public ActionListener addSearchUserListener()
+    private void performSearchUser()
     {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                adminPresenter.addSearchUserListener();
-            }
-        };
-        return e;
+        adminViewModel.SearchUser();
     }
 
-
-    public ActionListener onUpdateUserButtonClicked()
+    private void performUpdateUser()
     {
-        ActionListener e = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                adminPresenter.onUpdateUserButtonClicked();
-            }
-        };
-        return e;
+        adminViewModel.UpdateUser();
     }
 
-    @Override
-    public JList<String> getUserList() {
-        return list1;
-    }
-
-    @Override
-    public JList<String> getArtWorkList() {
-        return list2;
-    }
-
-    @Override
-    public void setArtWorkList(JList<String> artWorkList) {
-        this.list2 = list2;
-    }
-
-    @Override
-    public DefaultListModel<String> getArtWorksList() {
-        return listModel1;
-    }
-
-    @Override
-    public void setUserList(JList<String> userList) {
-        this.list1 = list1;
-    }
-
-    @Override
-    public void setArtWorksList(DefaultListModel<String> artWorksList) {
-        this.list2.setModel(artWorksList);
-    }
-
-    @Override
-    public DefaultListModel<String> getUserListModel() {
-        return listModel;
-    }
-
-    @Override
-    public void setUserListModel(DefaultListModel<String> userListModel) {
-        this.listModel = listModel;
-    }
-
-    @Override
-    public String getUsernameField() {
-        return textField1.getText();
-    }
-
-    @Override
-    public void setUsernameField(String username) {
-        this.textField1.setText(username);
-    }
-
-    @Override
-    public String getPasswordField() {
-        return textField2.getText();
-    }
-
-    @Override
-    public void setPasswordField(String password) {
-        this.textField2.setText(password);
-    }
-
-    @Override
-    public String getUserTypeField() {
-        return textField3.getText();
-    }
-
-    @Override
-    public void setUserTypeField(String userType) {
-        this.textField3.setText(userType);
-    }
-
-    public void showScreen()
+    private void performListArtWorks()
     {
-        frame.setVisible(true);
-    }
-    private void openArtWorkListUI() {
-        ArtWorkListView artWorkListView = new ArtWorkListView();
-        artWorkListView.showScreen();
+        adminViewModel.ListArtWorks();
     }
 
-    private void openUsersFilterUI() {
-        UsersFilterUI usersFilterUI = new UsersFilterUI();
-        usersFilterUI.setVisible(true);
+    private void performListUsers()
+    {
+        adminViewModel.ListUsers();
     }
+
+    private void performOpenToFilterUsers()
+    {
+        adminViewModel.OpenToFilterUsers();
+    }
+    private void performOpenToFilterListOfArtWorks()
+    {
+        adminViewModel.OpenToFilterListOfArtWorks();
+    }
+
 }

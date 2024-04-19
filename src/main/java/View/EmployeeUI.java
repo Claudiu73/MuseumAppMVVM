@@ -1,13 +1,12 @@
 package View;
 
-import Presenter.EmployeePresenter;
-import Presenter.IEmployeeUI;
+import ViewModel.EmployeeViewModel;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class EmployeeUI extends JFrame implements IEmployeeUI {
-    private EmployeePresenter employeePresenter;
+public class EmployeeUI extends JFrame {
+    private EmployeeViewModel employeeViewModel;
     private JList<String> list1;
     private DefaultListModel<String> listModel;
     private JTextField textField1, textField2, textField3, textField4;
@@ -19,7 +18,7 @@ public class EmployeeUI extends JFrame implements IEmployeeUI {
 
 
     public EmployeeUI() {
-        employeePresenter = new EmployeePresenter(this);
+        employeeViewModel = new EmployeeViewModel();
         frame = new JFrame("Servicii Angajat");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
@@ -42,7 +41,7 @@ public class EmployeeUI extends JFrame implements IEmployeeUI {
         panel.add(titleLabel);
 
         initializeComponents(panel);
-        employeePresenter.fetchAndDisplayArtworks();
+        performListArtWorks();
         frame.setContentPane(panel);
         frame.setVisible(true);
     }
@@ -53,6 +52,9 @@ public class EmployeeUI extends JFrame implements IEmployeeUI {
         JScrollPane scrollPane = new JScrollPane(list1);
         scrollPane.setBounds(520, 160, 210, 220);
         panel.add(scrollPane);
+
+
+        employeeViewModel.setArtworks(listModel);
 
         int yPosition = 245;
         Color color = new Color(206, 193, 193);
@@ -103,14 +105,24 @@ public class EmployeeUI extends JFrame implements IEmployeeUI {
         panel.add(generareXMLButton);
         panel.add(generareDocButton);
 
-        adaugaButton.addActionListener(e -> employeePresenter.onAddButtonClicked());
-        stergeButton.addActionListener(e -> employeePresenter.onDeleteButtonClicked());
-        actualizeazaButton.addActionListener(e -> employeePresenter.onUpdateButtonClicked());
-        cautaButton.addActionListener(e -> employeePresenter.onSearchButtonClicked());
-        generareCsvButton.addActionListener(e -> employeePresenter.onGenerateCsvButtonClicked());
-        generareJSONButton.addActionListener(e -> employeePresenter.onGenerateJSONButtonClicked());
-        generareXMLButton.addActionListener(e -> employeePresenter.onGenerateXMLButtonClicked());
-        generareDocButton.addActionListener(e -> employeePresenter.onGenerateSimpleDocButtonClicked());
+        adaugaButton.addActionListener(e -> performAddArtWork());
+        stergeButton.addActionListener(e -> {
+            employeeViewModel.setTitle(textField1.getText());
+            performDeleteArtWork();});
+        actualizeazaButton.addActionListener(e -> {
+            employeeViewModel.setTitle(textField1.getText());
+            employeeViewModel.setAuthor(textField2.getText());
+            employeeViewModel.setYear(Integer.parseInt(textField3.getText().toString()));
+            employeeViewModel.setType(textField4.getText());
+            performUpdateArtWork();
+        });
+        cautaButton.addActionListener(e -> {
+            employeeViewModel.setTitle(textField1.getText());
+            performSearchArtWork();});
+        generareCsvButton.addActionListener(e -> performGenerateCSVFile());
+        generareJSONButton.addActionListener(e -> performGenerateJSONFile());
+        generareXMLButton.addActionListener(e -> performGenerateXMLFile());
+        generareDocButton.addActionListener(e -> perfomGenerateDOCFile());
     }
 
     private void addLabeledField(JPanel panel, String label, JTextField textField, int x, int y) {
@@ -121,53 +133,61 @@ public class EmployeeUI extends JFrame implements IEmployeeUI {
         panel.add(textField);
     }
 
-
-    public JList<String> getList1() {
-        return list1;
+    private void performAddArtWork()
+    {
+        employeeViewModel.setTitle(textField1.getText().trim());
+        employeeViewModel.setAuthor(textField2.getText().trim());
+        employeeViewModel.setYear(Integer.parseInt(textField3.getText().trim()));
+        employeeViewModel.setType(textField4.getText().trim());
+        employeeViewModel.AddArtWorkClicked();
     }
 
-    public void setList1(JList<String> list1) {
-        this.list1 = list1;
+    private void performDeleteArtWork()
+    {
+        employeeViewModel.getTitle();
+        employeeViewModel.DeleteArtWorkClicked();
     }
 
-    public DefaultListModel<String> getListModel() {
-        return listModel;
+    private void performUpdateArtWork()
+    {
+        employeeViewModel.getTitle();
+        employeeViewModel.UpdateArtWorkClicked();
     }
 
-    public void setListModel(DefaultListModel<String> listModel) {
-        this.listModel = listModel;
+    private void performSearchArtWork()
+    {
+        employeeViewModel.getTitle();
+        employeeViewModel.SearchArtWorkClicked();
     }
 
-    public String getTextField1() {
-        return textField1.getText();
+    private void performGenerateCSVFile()
+    {
+        employeeViewModel.GenerateCSVFile();
     }
 
-    public void setTextField1(String textField1) {
-        this.textField1.setText( textField1);
+    private void performGenerateJSONFile()
+    {
+        employeeViewModel.GenerateJSONFile();
     }
 
-    public String getTextField2() {
-        return textField2.getText();
+    private void performGenerateXMLFile()
+    {
+        employeeViewModel.GenerateXMLFile();
     }
 
-    public void setTextField2(String textField2) {
-        this.textField2.setText(textField2);
+    private void perfomGenerateDOCFile()
+    {
+        employeeViewModel.GenerateDOCFile();
     }
 
-    public String getTextField3() {
-        return textField3.getText();
-    }
-
-    public void setTextField3(String textField3) {
-        this.textField3.setText(textField3);
-    }
-
-    public String getTextField4() {
-        return textField4.getText();
-    }
-
-    public void setTextField4(String textField4) {
-        this.textField4.setText(textField4);
+    private void performListArtWorks()
+    {
+        employeeViewModel.getArtworks();
+        employeeViewModel.getAuthor();
+        employeeViewModel.getTitle();
+        employeeViewModel.getYear();
+        employeeViewModel.getType();
+        employeeViewModel.ListArtWorks();
     }
 
 }
